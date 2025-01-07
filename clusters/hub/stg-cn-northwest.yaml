@@ -5,7 +5,7 @@ metadata:
   namespace: flux-system
 spec:
   interval: 5m
-  path: "./clusters/stg-cn-northwest"
+  path: "./clusters/stg-cn-northwest/app1"
   prune: true
   targetNamespace: mobile-loadtest
   sourceRef:
