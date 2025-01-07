@@ -1,0 +1,8 @@
+apiVersion: multicluster.fluxcd.io/v1alpha1
+kind: Cluster
+metadata:
+  name: stg-cn-northwest
+  namespace: flux-system
+spec:
+  kubeconfigSecretRef:
+    name: stg-cn-northwest-kubeconfig

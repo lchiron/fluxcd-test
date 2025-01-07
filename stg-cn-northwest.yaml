@@ -1,0 +1,36 @@
+apiVersion: v1
+clusters:
+- cluster:
+    certificate-authority-data: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURrVENDQW5tZ0F3SUJBZ0lVUHRSWlEvUTBPWTZaV3ZLQXorL2hjVGNpaHJNd0RRWUpLb1pJaHZjTkFRRUwKQlFBd05ERXlNREFHQTFVRUF4TXBjMk51TURJdWF6aHpMbUZyYVhSaExtbHVZeTVoZDNNdWF6aHpMbUZrYVdSaApjeTVqYjIwdVkyNHdIaGNOTWpNd05USXlNVEF3TVRBeldoY05Nek13TlRFNU1UQXdNVE15V2pBME1USXdNQVlEClZRUURFeWx6WTI0d01pNXJPSE11WVd0cGRHRXVhVzVqTG1GM2N5NXJPSE11WVdScFpHRnpMbU52YlM1amJqQ0MKQVNJd0RRWUpLb1pJaHZjTkFRRUJCUUFEZ2dFUEFEQ0NBUW9DZ2dFQkFMK0NwZnY0ZFJLYjNXRUpOdXdnb2RTawpVRnVDU0V0TkJQYmRQYkxqREJlMzMramN4d0lJSGZUYytWa3gzUmpSVFAyenZaVTBCbkJnMFhjQVkrNkRtNG5VCmtZRm5MMFJ1bW85cC84eTNIOXRabXZGOTRMemdFems3V0dTZkVSRmdvallvVEpZNUxNd2xlcFY0NnZGSHFBVUwKeFMzd3hjVzBodjZ3L2ZZK3RsQlZMdFNWS3BMcU11RURyL2RvQlpvdWFXU0hnQ2pBNStUbk1JU1Q3b3NJTmVUeQpLQWh1NkxNbDBmeHY2SVhxTVY3VmFaRmFzMGRRRUNpMlZVbGpuSi9CSWhDdm5ZYk55K2dUdHlNL2J2bTNEcFlxCmttZnBGVVNhaCtNY3lhOUlyZzB0K0FTUXRHUmk0cWN4d29CYStoNlJ3dHZLTXFrZmxkZ2FyOHc2cE5ueWFrMEMKQXdFQUFhT0JtakNCbHpBT0JnTlZIUThCQWY4RUJBTUNBUVl3RHdZRFZSMFRBUUgvQkFVd0F3RUIvekFkQmdOVgpIUTRFRmdRVWp1WmxHclhSQ3JVdnV4T3dIL0pCSjhmZ2JzRXdId1lEVlIwakJCZ3dGb0FVanVabEdyWFJDclV2CnV4T3dIL0pCSjhmZ2JzRXdOQVlEVlIwUkJDMHdLNElwYzJOdU1ESXVhemh6TG1GcmFYUmhMbWx1WXk1aGQzTXUKYXpoekxtRmthV1JoY3k1amIyMHVZMjR3RFFZSktvWklodmNOQVFFTEJRQURnZ0VCQUhvajBSMHIzWmNoWEhhQgpOeWthb2FrR2s2Y29Lc2tpNlVIZVpZM3NNdUFDSC9HNlZiYVUxTnNzQU5MRVFHY09UTEthM2JtbldVQTNReHNOCi95ZW1hMW5Gb3JrN1AwSkpMQ0xrMEpDcjYvQU9QT3dhb2t3TEphUFg3elJYbjJQOVRHWlU3TFlsNVRSbWQ4RWsKTjlRcnVEQWpRMW1PTU0xSzdUZ2RkT2FmQ285OVlEWllsOSt2d3RUTUdMVmI1MDZiUGk0YlNFdEs1NEZ4T2xVbwowTWY5dEkvMHgzTlFmcE44VFk0MVFwOUhLYVB3Nmc2TWg1d2ZWRkVCNmwzODVldWZpSmFJOTJ3Yjdlb1ZPaFRDCmtZWGdkUGdheFBxcVNmMzAycm1YMzFZY05Rak81T3pYbGpzTFdNd1dvVmxxc1RKbzZhTU01ekFIalU5MjJDTisKZTdQdnZlaz0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQ==
+    server: https://api.scn02.k8s.akita.inc.aws.k8s.adidas.com.cn:443
+  name: scn02
+contexts:
+- context:
+    cluster: scn02
+    user: azure-ad
+  name: stg-cn-northwest
+current-context: stg-cn-northwest
+kind: Config
+preferences: {}
+users:
+- name: azure-ad
+  user:
+    exec:
+      apiVersion: client.authentication.k8s.io/v1beta1
+      args:
+      - get-token
+      - --login
+      - devicecode
+      - --server-id
+      - 0287c3e5-3936-42ca-bf97-26997bd1de0c
+      - --client-id
+      - 5afbb522-7e7c-4fb0-bd93-78bcc6063ebc
+      - --tenant-id
+      - 3bfeb222-e42c-4535-aace-ea6f7751369b
+      - --environment
+      - AzurePublicCloud
+      - --legacy
+      command: kubelogin
+      env: null
+      interactiveMode: IfAvailable
+      provideClusterInfo: false
