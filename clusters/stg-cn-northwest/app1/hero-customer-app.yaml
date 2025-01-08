@@ -26,7 +26,6 @@ spec:
       annotations:
         base-image-repository.adidas.com/hero-customer-scn02: registry.tools.3stripes.net/base-images/alpine_node-20
         kubectl.kubernetes.io/restartedAt: "2024-10-31T04:40:49Z"
-      creationTimestamp: null
       labels:
         branch: adidas-hero-develop
         namespace: mobile
