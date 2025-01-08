@@ -608,11 +608,11 @@ spec:
             configMapKeyRef:
               key: ADIDAS_RUNNERS_TOKEN_EXPIRE_TIME
               name: hero-common-config
-        - name: PERSONALIZATION_SEGMENTATION_BASE_URL
-          valueFrom:
-            configMapKeyRef:
-              key: PERSONALIZATION_SEGMENTATION_BASE_URL
-              name: hero-common-config
+        # - name: PERSONALIZATION_SEGMENTATION_BASE_URL
+        #   valueFrom:
+        #     configMapKeyRef:
+        #       key: PERSONALIZATION_SEGMENTATION_BASE_URL
+        #       name: hero-common-config
         - name: SEGMENT_SEARCH_ALLOWED
           valueFrom:
             configMapKeyRef:
