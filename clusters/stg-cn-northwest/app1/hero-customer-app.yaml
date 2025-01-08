@@ -1,0 +1,1190 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    base-image-repository.adidas.com/hero-customer-scn02: registry.tools.3stripes.net/base-images/alpine_node-20
+  labels:
+    branch: adidas-hero-develop
+    run: hero-customer-app
+  name: hero-customer-app
+  namespace: mobile-loadtest
+spec:
+  minReadySeconds: 10
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 5
+  selector:
+    matchLabels:
+      run: hero-customer-app
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        base-image-repository.adidas.com/hero-customer-scn02: registry.tools.3stripes.net/base-images/alpine_node-20
+        kubectl.kubernetes.io/restartedAt: "2024-10-31T04:40:49Z"
+      creationTimestamp: null
+      labels:
+        branch: adidas-hero-develop
+        namespace: mobile
+        role: hero-customer-app
+        run: hero-customer-app
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: run
+                  operator: In
+                  values:
+                  - hero-customer-app
+              topologyKey: kubernetes.io/hostname
+            weight: 100
+      containers:
+      - env:
+        - name: K8S_NODE_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: spec.nodeName
+        - name: UV_THREADPOOL_SIZE
+          value: "64"
+        - name: CLUSTER_NAME
+          value: scn02
+        - name: INSTANA_AGENT_HOST
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.hostIP
+        - name: INSTANA_AUTO_PROFILE
+          valueFrom:
+            configMapKeyRef:
+              key: INSTANA_AUTO_PROFILE
+              name: hero-common-config
+              optional: true
+        - name: NODE_OPTIONS
+          value: --require /usr/src/app/node_modules/source-map-support/register --require
+            ./node_modules/@instana/collector/src/immediate --max-old-space-size=1433
+        - name: CLUSTER_WORKERS
+          value: "1"
+        - name: AKAMAI_BASE_URL
+          valueFrom:
+            configMapKeyRef:
+              key: AKAMAI_BASE_URL
+              name: hero-common-config
+        - name: IGNORE_LOG_URLS
+          valueFrom:
+            configMapKeyRef:
+              key: IGNORE_LOG_URLS
+              name: hero-common-config
+        - name: INSTANA_TRACING_ENABLED
+          valueFrom:
+            configMapKeyRef:
+              key: INSTANA_TRACING_ENABLED
+              name: hero-common-config
+        - name: CLUSTER_ZONE
+          valueFrom:
+            configMapKeyRef:
+              key: CLUSTER_ZONE
+              name: hero-common-config
+        - name: ALLOWED_TOKEN_AUTHORITIES
+          valueFrom:
+            configMapKeyRef:
+              key: ALLOWED_TOKEN_AUTHORITIES
+              name: hero-common-config
+        - name: ALLOWED_INSECURE_TLS_DOMAINS
+          valueFrom:
+            configMapKeyRef:
+              key: ALLOWED_INSECURE_TLS_DOMAINS
+              name: hero-common-config
+              optional: true
+        - name: USE_ASYNC_CONTEXT
+          valueFrom:
+            configMapKeyRef:
+              key: USE_ASYNC_CONTEXT
+              name: hero-common-config
+              optional: true
+        - name: USE_DNS_CACHE
+          valueFrom:
+            configMapKeyRef:
+              key: USE_DNS_CACHE
+              name: hero-common-config
+              optional: true
+        - name: CN_CACHE_CONTROL_PATH_JSON
+          valueFrom:
+            configMapKeyRef:
+              key: CN_CACHE_CONTROL_PATH_JSON
+              name: hero-common-config
+              optional: true
+        - name: DEVICE_CONFIGURATION_MODE
+          valueFrom:
+            configMapKeyRef:
+              key: DEVICE_CONFIGURATION_MODE
+              name: hero-common-config
+        - name: GMO_BASE_URL
+          valueFrom:
+            configMapKeyRef:
+              key: GMO_BASE_URL
+              name: hero-common-config
+        - name: EVENTS_GW_BASE_URL
+          valueFrom:
+            configMapKeyRef:
+              key: EVENTS_GW_BASE_URL
+              name: hero-common-config
+        - name: PRODUCT_GW_BASE_URL
+          valueFrom:
+            configMapKeyRef:
+              key: PRODUCT_GW_BASE_URL
+              name: hero-common-config
+        - name: GATEWAY_SELF_PUBLIC_URL
+          valueFrom:
+            configMapKeyRef:
+              key: GATEWAY_SELF_PUBLIC_URL
+              name: hero-common-config
+        - name: ORDERS_GW_BASE_URL
+          valueFrom:
+            configMapKeyRef:
+              key: ORDERS_GW_BASE_URL
+              name: hero-common-config
+        - name: ORDERS_GW_HOST
+          valueFrom:
+            configMapKeyRef:
+              key: ORDERS_GW_HOST
+              name: hero-common-config
+        - name: PROMOTIONS_BASE_URL
+          valueFrom:
+            configMapKeyRef:
+              key: PROMOTIONS_BASE_URL
+              name: hero-common-config
+        - name: KAFKA_NAMESPACE
+          valueFrom:
+            configMapKeyRef:
+              key: KAFKA_NAMESPACE
+              name: hero-common-config
+        - name: KAFKA_WAITLIST_TOPIC
+          valueFrom:
+            configMapKeyRef:
+              key: KAFKA_WAITLIST_TOPIC
+              name: hero-common-config
+        - name: KAFKA_REST_PROXY
+          valueFrom:
+            configMapKeyRef:
+              key: KAFKA_REST_PROXY
+              name: hero-common-config
+        - name: KAFKA_WAITLIST_SCHEMA_VALUE_ID
+          valueFrom:
+            configMapKeyRef:
+              key: KAFKA_WAITLIST_SCHEMA_VALUE_ID
+              name: hero-common-config
+        - name: KAFKA_WAITLIST_SCHEMA_KEY_ID
+          valueFrom:
+            configMapKeyRef:
+              key: KAFKA_WAITLIST_SCHEMA_KEY_ID
+              name: hero-common-config
+        - name: KAFKA_REST_PROXY_URL
+          valueFrom:
+            configMapKeyRef:
+              key: KAFKA_REST_PROXY_URL
+              name: hero-common-config
+              optional: true
+        - name: ECP_BASE_URL
+          valueFrom:
+            configMapKeyRef:
+              key: ECP_BASE_URL
+              name: hero-common-config
+              optional: true
+        - name: ECP_STATIC_RESOURCE_URL
+          valueFrom:
+            configMapKeyRef:
+              key: ECP_STATIC_RESOURCE_URL
+              name: hero-common-config
+              optional: true
+        - name: ECP_CMS_POPUP_RESOURCE_URL
+          valueFrom:
+            configMapKeyRef:
+              key: ECP_CMS_POPUP_RESOURCE_URL
+              name: hero-common-config
+              optional: true
+        - name: ANA_BASE_URL
+          valueFrom:
+            configMapKeyRef:
+              key: ANA_BASE_URL
+              name: hero-common-config
+              optional: true
+        - name: DYNAMO_DB_REGION
+          valueFrom:
+            configMapKeyRef:
+              key: DYNAMO_DB_REGION
+              name: hero-common-config
+              optional: true
+        - name: DYNAMO_USER_PREFERENCES
+          valueFrom:
+            configMapKeyRef:
+              key: DYNAMO_USER_PREFERENCES
+              name: hero-common-config
+              optional: true
+        - name: RESOURCES_S3_BUCKET
+          valueFrom:
+            configMapKeyRef:
+              key: RESOURCES_S3_BUCKET
+              name: hero-common-config
+        - name: STRINGS_S3_BUCKET
+          valueFrom:
+            configMapKeyRef:
+              key: STRINGS_S3_BUCKET
+              name: hero-common-config
+        - name: CN_RESOURCES_S3_BUCKET
+          valueFrom:
+            configMapKeyRef:
+              key: CN_RESOURCES_S3_BUCKET
+              name: hero-common-config
+        - name: CN_STRINGS_S3_BUCKET
+          valueFrom:
+            configMapKeyRef:
+              key: CN_STRINGS_S3_BUCKET
+              name: hero-common-config
+        - name: CN_S3_REGION
+          valueFrom:
+            configMapKeyRef:
+              key: CN_S3_REGION
+              name: hero-common-config
+        - name: CACHE_MANAGER_INTEGRATION_CACHES
+          valueFrom:
+            configMapKeyRef:
+              key: CACHE_MANAGER_INTEGRATION_CACHES
+              name: hero-common-config
+              optional: true
+        - name: CACHE_MANAGER_INTEGRATION_GATEWAY_RESOURCES
+          valueFrom:
+            configMapKeyRef:
+              key: CACHE_MANAGER_INTEGRATION_GATEWAY_RESOURCES
+              name: hero-common-config
+              optional: true
+        - name: REDIS_CLUSTER_MASTER
+          valueFrom:
+            configMapKeyRef:
+              key: REDIS_CLUSTER_MASTER
+              name: hero-common-config
+              optional: true
+        - name: REDIS_CLUSTER_USE_TLS
+          valueFrom:
+            configMapKeyRef:
+              key: REDIS_CLUSTER_USE_TLS
+              name: hero-common-config
+              optional: true
+        - name: REDIS_CLUSTER_TIMEOUT
+          valueFrom:
+            configMapKeyRef:
+              key: REDIS_CLUSTER_TIMEOUT
+              name: hero-common-config
+              optional: true
+        - name: REDIS_HOST
+          valueFrom:
+            configMapKeyRef:
+              key: REDIS_HOST
+              name: hero-common-config
+              optional: true
+        - name: REDIS_PORT
+          valueFrom:
+            configMapKeyRef:
+              key: REDIS_PORT
+              name: hero-common-config
+              optional: true
+        - name: POSTGRES_MAX_CON
+          valueFrom:
+            configMapKeyRef:
+              key: POSTGRES_MAX_CON
+              name: hero-common-config
+              optional: true
+        - name: POSTGRES_MIN_CON
+          valueFrom:
+            configMapKeyRef:
+              key: POSTGRES_MIN_CON
+              name: hero-common-config
+              optional: true
+        - name: POSTGRES_READER_HOSTS
+          valueFrom:
+            configMapKeyRef:
+              key: POSTGRES_READER_HOSTS
+              name: hero-common-config
+              optional: true
+        - name: POSTGRES_HOST
+          valueFrom:
+            configMapKeyRef:
+              key: POSTGRES_HOST
+              name: hero-common-config
+        - name: ADYEN_HOST
+          valueFrom:
+            configMapKeyRef:
+              key: ADYEN_HOST
+              name: hero-common-config
+        - name: IN_ADYEN_HOST
+          valueFrom:
+            configMapKeyRef:
+              key: IN_ADYEN_HOST
+              name: hero-common-config
+              optional: true
+        - name: ADYEN_VERSION
+          valueFrom:
+            configMapKeyRef:
+              key: ADYEN_VERSION
+              name: hero-common-config
+        - name: ADYEN_DETAILS_URL
+          valueFrom:
+            configMapKeyRef:
+              key: ADYEN_DETAILS_URL
+              name: hero-common-config
+        - name: IN_ADYEN_DETAILS_URL
+          valueFrom:
+            configMapKeyRef:
+              key: IN_ADYEN_DETAILS_URL
+              name: hero-common-config
+              optional: true
+        - name: CUSTOM_ADYEN_MARKETS
+          valueFrom:
+            configMapKeyRef:
+              key: CUSTOM_ADYEN_MARKETS
+              name: hero-common-config
+        - name: CUSTOM_ADYEN_VERSION
+          valueFrom:
+            configMapKeyRef:
+              key: CUSTOM_ADYEN_VERSION
+              name: hero-common-config
+        - name: IN_FALLBACK_ADYEN_MERCHANT_ACCOUNT
+          valueFrom:
+            configMapKeyRef:
+              key: IN_FALLBACK_ADYEN_MERCHANT_ACCOUNT
+              name: hero-common-config
+              optional: true
+        - name: APPLE_PASS_TEAM_IDENTIFIER
+          valueFrom:
+            configMapKeyRef:
+              key: APPLE_PASS_TEAM_IDENTIFIER
+              name: hero-common-config
+        - name: COMMERCE_LITE_COUNTRIES
+          valueFrom:
+            configMapKeyRef:
+              key: COMMERCE_LITE_COUNTRIES
+              name: hero-common-config
+        - name: ADDRESS_VALIDATION_URL
+          valueFrom:
+            configMapKeyRef:
+              key: ADDRESS_VALIDATION_URL
+              name: hero-common-config
+        - name: ADDRESS_VALIDATION_MARKETS
+          valueFrom:
+            configMapKeyRef:
+              key: ADDRESS_VALIDATION_MARKETS
+              name: hero-common-config
+        - name: ADDRESS_HANDLING_URL
+          valueFrom:
+            configMapKeyRef:
+              key: ADDRESS_HANDLING_URL
+              name: hero-common-config
+              optional: true
+        - name: PAYS_BASE_URL
+          valueFrom:
+            configMapKeyRef:
+              key: PAYS_BASE_URL
+              name: hero-common-config
+        - name: APPLE_REWARD_API_BASE_URL
+          valueFrom:
+            configMapKeyRef:
+              key: APPLE_REWARD_API_BASE_URL
+              name: hero-common-config
+        - name: APPLE_REWARD_CAMPAIGN_ID
+          valueFrom:
+            configMapKeyRef:
+              key: APPLE_REWARD_CAMPAIGN_ID
+              name: hero-common-config
+        - name: PRIVACY_SERVICE_BASE_URL
+          valueFrom:
+            configMapKeyRef:
+              key: PRIVACY_SERVICE_BASE_URL
+              name: hero-common-config
+        - name: SERVICE_LOG_LEVEL
+          valueFrom:
+            configMapKeyRef:
+              key: SERVICE_LOG_LEVEL
+              name: hero-common-config
+              optional: true
+        - name: EXPRESS_LOG_LEVEL
+          valueFrom:
+            configMapKeyRef:
+              key: EXPRESS_LOG_LEVEL
+              name: hero-common-config
+              optional: true
+        - name: DYNAMICS_ECOM_WSDL
+          valueFrom:
+            configMapKeyRef:
+              key: DYNAMICS_ECOM_WSDL
+              name: hero-common-config
+        - name: DYNAMICS_ECOM_REST
+          valueFrom:
+            configMapKeyRef:
+              key: DYNAMICS_ECOM_REST
+              name: hero-common-config
+        - name: DYNAMICS_USER
+          valueFrom:
+            configMapKeyRef:
+              key: DYNAMICS_USER
+              name: hero-common-config
+        - name: INTERESTS_CDN_URL
+          valueFrom:
+            configMapKeyRef:
+              key: INTERESTS_CDN_URL
+              name: hero-common-config
+        - name: INTERESTS_CDN_URL_CN
+          valueFrom:
+            configMapKeyRef:
+              key: INTERESTS_CDN_URL_CN
+              name: hero-common-config
+        - name: AIC_BASE_URL
+          valueFrom:
+            configMapKeyRef:
+              key: AIC_BASE_URL
+              name: hero-common-config
+        - name: AIC_REQUEST_LOGGING
+          valueFrom:
+            configMapKeyRef:
+              key: AIC_REQUEST_LOGGING
+              name: hero-common-config
+              optional: true
+        - name: AIC_TOKEN_URL
+          valueFrom:
+            configMapKeyRef:
+              key: AIC_TOKEN_URL
+              name: hero-common-config
+        - name: AIC_SOURCE
+          valueFrom:
+            configMapKeyRef:
+              key: AIC_SOURCE
+              name: hero-common-config
+        - name: AIC_GMR_SOURCE
+          valueFrom:
+            configMapKeyRef:
+              key: AIC_GMR_SOURCE
+              name: hero-common-config
+        - name: AIC_TRILOGY_SOURCE
+          valueFrom:
+            configMapKeyRef:
+              key: AIC_TRILOGY_SOURCE
+              name: hero-common-config
+        - name: AIC_RUNNING_SOURCE
+          valueFrom:
+            configMapKeyRef:
+              key: AIC_RUNNING_SOURCE
+              name: hero-common-config
+        - name: AIC_TRAINING_SOURCE
+          valueFrom:
+            configMapKeyRef:
+              key: AIC_TRAINING_SOURCE
+              name: hero-common-config
+        - name: AIC_SCOPE
+          valueFrom:
+            configMapKeyRef:
+              key: AIC_SCOPE
+              name: hero-common-config
+        - name: AIC_VALIDATOR_ID
+          valueFrom:
+            configMapKeyRef:
+              key: AIC_VALIDATOR_ID
+              name: hero-common-config
+        - name: AIC_PASSWORDLESS_REDIRECT_URI
+          valueFrom:
+            configMapKeyRef:
+              key: AIC_PASSWORDLESS_REDIRECT_URI
+              name: hero-common-config
+        - name: AIC_MULTILANGUAGE_SITES
+          valueFrom:
+            configMapKeyRef:
+              key: AIC_MULTILANGUAGE_SITES
+              name: hero-common-config
+        - name: AIC_APPLICATION_ID
+          valueFrom:
+            configMapKeyRef:
+              key: AIC_APPLICATION_ID
+              name: hero-common-config
+        - name: AIC_USER_TOKEN_REDIRECT_URL
+          valueFrom:
+            configMapKeyRef:
+              key: AIC_USER_TOKEN_REDIRECT_URL
+              name: hero-common-config
+              optional: true
+        - name: AIC_COUNTRY_EXTENSIONS
+          valueFrom:
+            configMapKeyRef:
+              key: AIC_COUNTRY_EXTENSIONS
+              name: hero-common-config
+              optional: true
+        - name: PASSWORD_AIC_RESET_REDIRECT_URL
+          valueFrom:
+            configMapKeyRef:
+              key: PASSWORD_AIC_RESET_REDIRECT_URL
+              name: hero-common-config
+        - name: PASSWORD_BBF_RESET_REDIRECT_URL
+          valueFrom:
+            configMapKeyRef:
+              key: PASSWORD_BBF_RESET_REDIRECT_URL
+              name: hero-common-config
+        - name: SFSC_BASE_URL
+          valueFrom:
+            configMapKeyRef:
+              key: SFSC_BASE_URL
+              name: hero-common-config
+        - name: SFSC_GDPR_SUPPORTED_MARKETS
+          valueFrom:
+            configMapKeyRef:
+              key: SFSC_GDPR_SUPPORTED_MARKETS
+              name: hero-common-config
+        - name: QUALTRICS_BASE_URL
+          valueFrom:
+            configMapKeyRef:
+              key: QUALTRICS_BASE_URL
+              name: hero-common-config
+        - name: LOYALTY_ENGINE_URL_PREFIX
+          valueFrom:
+            configMapKeyRef:
+              key: LOYALTY_ENGINE_URL_PREFIX
+              name: hero-common-config
+        - name: OFFER_API_BASE_URL
+          valueFrom:
+            configMapKeyRef:
+              key: OFFER_API_BASE_URL
+              name: hero-common-config
+        - name: REDEMPTION_API_BASE_URL
+          valueFrom:
+            configMapKeyRef:
+              key: REDEMPTION_API_BASE_URL
+              name: hero-common-config
+        - name: MEMBERSHIP_API_BASE_URL
+          valueFrom:
+            configMapKeyRef:
+              key: MEMBERSHIP_API_BASE_URL
+              name: hero-common-config
+        - name: GENERIC_3P_VOUCHER_TEMPLATE_ID
+          valueFrom:
+            configMapKeyRef:
+              key: GENERIC_3P_VOUCHER_TEMPLATE_ID
+              name: hero-common-config
+        - name: PRINT_CURL_REQUESTS
+          valueFrom:
+            configMapKeyRef:
+              key: PRINT_CURL_REQUESTS
+              name: hero-common-config
+              optional: true
+        - name: POSTGRES_DB
+          valueFrom:
+            configMapKeyRef:
+              key: POSTGRES_DB
+              name: hero-common-config
+        - name: APPLE_PASS_CREATORS_TYPE_IDENTIFIER
+          valueFrom:
+            configMapKeyRef:
+              key: APPLE_PASS_CREATORS_TYPE_IDENTIFIER
+              name: hero-common-config
+        - name: APPLE_PASS_WEBSERVICE_URL
+          valueFrom:
+            configMapKeyRef:
+              key: APPLE_PASS_WEBSERVICE_URL
+              name: hero-common-config
+        - name: INVITATION_DEEPLINK
+          valueFrom:
+            configMapKeyRef:
+              key: INVITATION_DEEPLINK
+              name: hero-common-config
+        - name: ADIDAS_RUNNERS_BASE_URL
+          valueFrom:
+            configMapKeyRef:
+              key: ADIDAS_RUNNERS_BASE_URL
+              name: hero-common-config
+        - name: ADIDAS_RUNNERS_TOKEN_EXPIRE_TIME
+          valueFrom:
+            configMapKeyRef:
+              key: ADIDAS_RUNNERS_TOKEN_EXPIRE_TIME
+              name: hero-common-config
+        - name: PERSONALIZATION_SEGMENTATION_BASE_URL
+          valueFrom:
+            configMapKeyRef:
+              key: PERSONALIZATION_SEGMENTATION_BASE_URL
+              name: hero-common-config
+        - name: SEGMENT_SEARCH_ALLOWED
+          valueFrom:
+            configMapKeyRef:
+              key: SEGMENT_SEARCH_ALLOWED
+              name: hero-common-config
+              optional: true
+        - name: TRACK_CACHE_HITS
+          valueFrom:
+            configMapKeyRef:
+              key: TRACK_CACHE_HITS
+              name: hero-common-config
+              optional: true
+        - name: ADDRESS_BLOCKED_APC_MARKETS
+          valueFrom:
+            configMapKeyRef:
+              key: ADDRESS_BLOCKED_APC_MARKETS
+              name: hero-common-config
+              optional: true
+        - name: CIRCUIT_BREAKER_TIMEOUT
+          valueFrom:
+            configMapKeyRef:
+              key: CIRCUIT_BREAKER_TIMEOUT
+              name: hero-common-config
+              optional: true
+        - name: CIRCUIT_BREAKER_ERROR_THRESHOLD_PERCENTAGE
+          valueFrom:
+            configMapKeyRef:
+              key: CIRCUIT_BREAKER_ERROR_THRESHOLD_PERCENTAGE
+              name: hero-common-config
+              optional: true
+        - name: CIRCUIT_BREAKER_RESET_TIMEOUT
+          valueFrom:
+            configMapKeyRef:
+              key: CIRCUIT_BREAKER_RESET_TIMEOUT
+              name: hero-common-config
+              optional: true
+        - name: APC_CONSENT_COUNTRIES_ADIDASAPP
+          valueFrom:
+            configMapKeyRef:
+              key: APC_CONSENT_COUNTRIES_ADIDASAPP
+              name: hero-common-config
+              optional: true
+        - name: APC_CONSENT_COUNTRIES_CONFIRMED
+          valueFrom:
+            configMapKeyRef:
+              key: APC_CONSENT_COUNTRIES_CONFIRMED
+              name: hero-common-config
+              optional: true
+        - name: ACCESS_CONTROL_WARNING_MODE
+          valueFrom:
+            configMapKeyRef:
+              key: ACCESS_CONTROL_WARNING_MODE
+              name: hero-common-config
+              optional: true
+        - name: HTTP_CLIENT_TIMEOUT_KEEP_ALIVE
+          valueFrom:
+            configMapKeyRef:
+              key: HTTP_CLIENT_TIMEOUT_KEEP_ALIVE
+              name: hero-common-config
+              optional: true
+        - name: HTTP_CLIENT_MAX_SOCKETS_KEEP_ALIVE
+          valueFrom:
+            configMapKeyRef:
+              key: HTTP_CLIENT_MAX_SOCKETS_KEEP_ALIVE
+              name: hero-common-config
+              optional: true
+        - name: HTTP_CLIENT_MAX_FREE_SOCKETS_KEEP_ALIVE
+          valueFrom:
+            configMapKeyRef:
+              key: HTTP_CLIENT_MAX_FREE_SOCKETS_KEEP_ALIVE
+              name: hero-common-config
+              optional: true
+        - name: HTTP_CLIENT_FREE_SOCKET_TIMEOUT_KEEP_ALIVE
+          valueFrom:
+            configMapKeyRef:
+              key: HTTP_CLIENT_FREE_SOCKET_TIMEOUT_KEEP_ALIVE
+              name: hero-common-config
+              optional: true
+        - name: HTTP_CLIENT_SOCKET_ACTIVE_TTL_KEEP_ALIVE
+          valueFrom:
+            configMapKeyRef:
+              key: HTTP_CLIENT_SOCKET_ACTIVE_TTL_KEEP_ALIVE
+              name: hero-common-config
+              optional: true
+        - name: TRANS4RM_TRANSLATION_ENABLED
+          valueFrom:
+            configMapKeyRef:
+              key: TRANS4RM_TRANSLATION_ENABLED
+              name: hero-common-config
+              optional: true
+        - name: TRANS4RM_TRANSLATION_EXCLUSIONS
+          valueFrom:
+            configMapKeyRef:
+              key: TRANS4RM_TRANSLATION_EXCLUSIONS
+              name: hero-common-config
+              optional: true
+        - name: SECRET_APPLE_REWARD_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_APPLE_REWARD_SECRET_KEY
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+        - name: SECRET_X_API_KEY
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_CN_X_API_KEY
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+        - name: SECRET_EVENTS_GW_X_API_KEY
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_EVENTS_GW_X_API_KEY
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+        - name: SECRET_SFSC_CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_SFSC_CLIENT_ID
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+        - name: SECRET_SFSC_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_SFSC_CLIENT_SECRET
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+        - name: SECRET_SFSC_CCPA_USERNAME
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_SFSC_CCPA_USERNAME
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+        - name: SECRET_SFSC_CCPA_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_SFSC_CCPA_PASSWORD
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+        - name: SECRET_SFSC_LGPD_USERNAME
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_SFSC_LGPD_USERNAME
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+        - name: SECRET_SFSC_LGPD_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_SFSC_LGPD_PASSWORD
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+        - name: SECRET_SFSC_PIPA_USERNAME
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_SFSC_PIPA_USERNAME
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+        - name: SECRET_SFSC_PIPA_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_SFSC_PIPA_PASSWORD
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+        - name: SECRET_SFSC_GDPR_USERNAME
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_SFSC_GDPR_USERNAME
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+        - name: SECRET_SFSC_GDPR_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_SFSC_GDPR_PASSWORD
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+        - name: SECRET_SFSC_EMAIL_DELETE_ONLY_USERNAME
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_SFSC_EMAIL_DELETE_ONLY_USERNAME
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+        - name: SECRET_SFSC_EMAIL_DELETE_ONLY_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_SFSC_EMAIL_DELETE_ONLY_PASSWORD
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+        - name: SECRET_LOYALTY_ENGINE_MASHERY_API_KEY
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_LOYALTY_ENGINE_MASHERY_API_KEY
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+        - name: SECRET_LOYALTY_ENGINE_MASHERY_API_SECRET
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_LOYALTY_ENGINE_MASHERY_API_SECRET
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+        - name: SECRET_LOYALTY_SERVER_TO_SERVER_API_KEY
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_LOYALTY_SERVER_TO_SERVER_API_KEY
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+        - name: SECRET_LOYALTY_SERVER_TO_SERVER_API_SECRET
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_LOYALTY_SERVER_TO_SERVER_API_SECRET
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+        - name: SECRET_REDEMPTION_API_KEY
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_REDEMPTION_API_KEY
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+        - name: SECRET_REDEMPTION_API_SECRET
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_REDEMPTION_API_SECRET
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+        - name: SECRET_MEMBERSHIP_API_KEY
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_MEMBERSHIP_API_KEY
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+        - name: SECRET_MEMBERSHIP_API_SECRET
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_MEMBERSHIP_API_SECRET
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+        - name: SECRET_DYNAMICS_PASS
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_DYNAMICS_PASS
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+        - name: DYNAMICS_V2_BASE_URL
+          valueFrom:
+            configMapKeyRef:
+              key: DYNAMICS_V2_BASE_URL
+              name: hero-common-config
+              optional: true
+        - name: DYNAMICS_V2_API_KEY
+          valueFrom:
+            configMapKeyRef:
+              key: DYNAMICS_V2_API_KEY
+              name: hero-common-config
+              optional: true
+        - name: SECRET_TOKEN_ALG
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_TOKEN_ALG
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+        - name: SECRET_TOKEN_ISS
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_TOKEN_ISS
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+        - name: SECRET_TOKEN_X5T
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_TOKEN_X5T
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+        - name: SECRET_TOKEN_KID
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_TOKEN_KID
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+        - name: SECRET_TOKEN_AUTHSOURCE
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_TOKEN_AUTHSOURCE
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+        - name: SECRET_OFFER_API_KEY
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_OFFER_API_KEY
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+        - name: SECRET_OFFER_API_SECRET
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_OFFER_API_SECRET
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+        - name: SECRET_QUALTRICS_SURVEY_ID
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_QUALTRICS_SURVEY_ID
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+        - name: SECRET_QUALTRICS_GIVEBACK_SURVEY_ID
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_QUALTRICS_GIVEBACK_SURVEY_ID
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+        - name: SECRET_QUALTRICS_GET_SURVEY_ID
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_QUALTRICS_GET_SURVEY_ID
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+        - name: SECRET_QUALTRICS_API_KEY
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_QUALTRICS_API_KEY
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+        - name: SECRET_CN_S3_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_CN_S3_ACCESS_KEY_ID
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+        - name: SECRET_CN_S3_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_CN_S3_SECRET_ACCESS_KEY
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+        - name: SECRET_AIC_CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_AIC_CLIENT_ID
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+        - name: SECRET_AIC_GMR_CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_AIC_GMR_CLIENT_ID
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+        - name: SECRET_AIC_TRILOGY_CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_AIC_TRILOGY_CLIENT_ID
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+        - name: SECRET_AIC_RUNNING_CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_AIC_RUNNING_CLIENT_ID
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+        - name: SECRET_AIC_TRAINING_CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_AIC_TRAINING_CLIENT_ID
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+        - name: SECRET_AIC_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_AIC_PASSWORD
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+              optional: true
+        - name: SECRET_AIC_USER_TOKEN_CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_AIC_USER_TOKEN_CLIENT_ID
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+              optional: true
+        - name: SECRET_ADYEN_3D_SECURE_API_KEY
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_ADYEN_3D_SECURE_API_KEY
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+        - name: SECRET_NAM_ADYEN_USER
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_NAM_ADYEN_USER
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+        - name: SECRET_NAM_ADYEN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_NAM_ADYEN_PASSWORD
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+        - name: SECRET_LAM_ADYEN_USER
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_LAM_ADYEN_USER
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+        - name: SECRET_LAM_ADYEN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_LAM_ADYEN_PASSWORD
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+        - name: SECRET_WE_ADYEN_USER
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_WE_ADYEN_USER
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+        - name: SECRET_WE_ADYEN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_WE_ADYEN_PASSWORD
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+        - name: SECRET_RU_ADYEN_USER
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_RU_ADYEN_USER
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+        - name: SECRET_RU_ADYEN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_RU_ADYEN_PASSWORD
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+        - name: SECRET_SEA_ADYEN_USER
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_SEA_ADYEN_USER
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+        - name: SECRET_SEA_ADYEN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_SEA_ADYEN_PASSWORD
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+        - name: SECRET_PACIFIC_ADYEN_USER
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_PACIFIC_ADYEN_USER
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+        - name: SECRET_PACIFIC_ADYEN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_PACIFIC_ADYEN_PASSWORD
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+        - name: SECRET_TR_ADYEN_USER
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_TR_ADYEN_USER
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+        - name: SECRET_TR_ADYEN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_TR_ADYEN_PASSWORD
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+        - name: SECRET_IN_FALLBACK_ADYEN_USER
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_IN_FALLBACK_ADYEN_USER
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+              optional: true
+        - name: SECRET_IN_FALLBACK_ADYEN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_IN_FALLBACK_ADYEN_PASSWORD
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+              optional: true
+        - name: SECRET_GMO_SITE_ID
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_GMO_SITE_ID
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+        - name: SECRET_GMO_SITE_PASS
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_GMO_SITE_PASS
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+        - name: SECRET_GMO_SHOP_ID
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_GMO_SHOP_ID
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+        - name: SECRET_GMO_SHOP_PASS
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_GMO_SHOP_PASS
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+        - name: SECRET_GMO_KEY_HASH
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_GMO_KEY_HASH
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+        - name: SECRET_APPLE_PASS_PEM_CERTIFICATE
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_APPLE_PASS_PEM_CERTIFICATE
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+        - name: SECRET_APPLE_PASS_PEM_PRIVATE_KEY
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_APPLE_PASS_PEM_PRIVATE_KEY
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+        - name: SECRET_APPLE_PASS_PEM_PRIVATE_KEY_PASSPHRASE
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_APPLE_PASS_PEM_PRIVATE_KEY_PASSPHRASE
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+        - name: SECRET_APPLE_PASS_AUTH_TOKEN_SECRET
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_APPLE_PASS_AUTH_TOKEN_SECRET
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+        - name: SECRET_PERSONALIZATION_API_KEY
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_PERSONALIZATION_API_KEY
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+        - name: SECRET_ADDRESS_VALIDATION_API_KEY
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_ADDRESS_VALIDATION_API_KEY_AP
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+        - name: SECRET_POSTGRES_PASS
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_POSTGRES_PASS
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+        - name: SECRET_POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_POSTGRES_USER
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+        - name: SECRET_ANA_API_KEY
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_ANA_API_KEY
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+              optional: true
+        - name: SECRET_REDIS_CLUSTER_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_REDIS_CLUSTER_PASSWORD
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+              optional: true
+        - name: SECRET_CRYPTO_KEY
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_CRYPTO_KEY
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+        - name: SECRET_KAFKA_REST_PROXY_AUTH
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_KAFKA_REST_PROXY_AUTH
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+        - name: SECRET_KAFKA_REST_PROXY_BASIC_AUTH
+          valueFrom:
+            secretKeyRef:
+              key: SECRET_KAFKA_REST_PROXY_BASIC_AUTH
+              name: hero-global-adidas-hero-develop-secrets-fortanix
+              optional: true
+        image: registry.tools.adidas.com.cn/mobile-v2/hero-customer-gw-develop:df4af469c9f67bb4129669cef7375f4643578a3f
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /gw-api/v2/_manage/health/live
+            port: 3000
+            scheme: HTTP
+          initialDelaySeconds: 20
+          periodSeconds: 45
+          successThreshold: 1
+          timeoutSeconds: 10
+        name: hero-customer-scn02
+        ports:
+        - containerPort: 3000
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /gw-api/v2/_manage/health/ready
+            port: 3000
+            scheme: HTTP
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 2
+        resources:
+          limits:
+            cpu: 300m
+            memory: 384Mi
+          requests:
+            cpu: 270m
+            memory: 256Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          privileged: false
+          readOnlyRootFilesystem: true
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsConfig:
+        options:
+        - name: ndots
+          value: "1"
+      dnsPolicy: ClusterFirst
+      imagePullSecrets:
+      - name: harbor-odp
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext:
+        runAsGroup: 1000
+        runAsNonRoot: true
+        runAsUser: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      terminationGracePeriodSeconds: 30
+      topologySpreadConstraints:
+      - labelSelector:
+          matchLabels:
+            run: hero-customer-app
+        maxSkew: 1
+        topologyKey: topology.kubernetes.io/zone
+        whenUnsatisfiable: ScheduleAnyway
