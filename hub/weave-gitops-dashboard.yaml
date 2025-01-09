@@ -35,7 +35,7 @@ spec:
   interval: 1h0m0s
   values:
     WEAVE_GITOPS_FEATURE_TELEMETRY: "true"
-    WEAVE_GITOPS_FEATURE_CLUSTER: "true"
+    WEAVE_GITOPS_FEATURE_CLUSTER: "false"
     adminUser:
       create: true
       passwordHash: $2a$10$FHjjgyFV5taKEq/kp0dEouRuIg6MjLXMzoIWQUisccRfCxQmiRntq
